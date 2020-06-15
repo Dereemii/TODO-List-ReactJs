@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClipboardList } from '@fortawesome/free-solid-svg-icons'
@@ -12,6 +12,68 @@ function App() {
   const [newTodo, setNewTodo] = useState("")
   const [todos, setTodos] = useState([]) 
 
+  useEffect(() => {
+
+    fetch("https://assets.breatheco.de/apis/fake/todos/user/nuevousuario", {
+      method: "POST",
+      body: JSON.stringify([]),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((resp) => {
+        console.log(resp);
+        return resp.json();
+      })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+  }, []);
+
+  useEffect(() => {
+    fetch("https://assets.breatheco.de/apis/fake/todos/user/nuevousuario", {
+      method: "PUT",
+      body: JSON.stringify(
+        todos.map((label) => {
+          return { label: label, done: false };
+        })
+      ),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((resp) => resp.json())
+      .then((data) => console.log(data))
+      .catch((error) => console.log(error));
+    
+    }, [todos]);
+
+    function clearAll() {    
+      fetch("https://assets.breatheco.de/apis/fake/todos/user/nuevousuario", 
+        {
+          method:"DELETE", 
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+          .then(resp => {
+            console.log(resp)
+            return resp.json()
+          })
+          .then(data => {
+            console.log(data)
+          })
+          .catch(error => {
+            console.log(error)
+          });
+
+    }
+
+
   function handleNewTodoChange(event){
     event.preventDefault()
     setNewTodo(event.target.value)
@@ -19,7 +81,7 @@ function App() {
 
   function handleNewTodo(event){
     event.preventDefault()
-    if (newTodo === "") return
+    if (newTodo === "")  return
     setTodos([...todos, {id: Date.now(), text: newTodo}])
     event.target.reset()
   }
